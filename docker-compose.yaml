@@ -1,0 +1,70 @@
+services:
+  spark-master:
+    image: apache/spark:4.0.0
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+    entrypoint: 
+      - "bash"
+      - "-c"
+      - "/opt/spark/sbin/start-master.sh  && tail -f /dev/null"
+    volumes:
+      - ./data:/opt/spark/work-dir/spark-warehouse/data:rw
+      - ./spark-events:/tmp/spark-events
+
+  spark-worker_1:
+    image: apache/spark:4.0.0
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    depends_on:
+      - spark-master
+
+    environment:
+      - SPARK_WORKER_CORES=4
+      - SPARK_WORKER_MEMORY=6144m
+      
+    entrypoint:
+      - "bash" 
+      - "-c"
+      - "/opt/spark/sbin/start-worker.sh spark://spark-master:7077  && tail -f /dev/null"
+    volumes:
+      - ./data:/opt/spark/work-dir/spark-warehouse/data:rw
+      - ./spark-events:/tmp/spark-events
+  
+  spark-worker_2:
+    image: apache/spark:4.0.0
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_WORKER_CORES=4
+      - SPARK_WORKER_MEMORY=6144m
+    entrypoint:
+      - "bash" 
+      - "-c"
+      - "/opt/spark/sbin/start-worker.sh spark://spark-master:7077  && tail -f /dev/null"
+    volumes:
+      - ./data:/opt/spark/work-dir/spark-warehouse/data:rw
+      - ./spark-events:/tmp/spark-events
+
+  spark-history-server:
+    image: apache/spark:4.0.0
+    container_name: spark-history-server
+    hostname: spark-history-server
+    ports:
+      - "18080:18080"
+    volumes:
+      - ./spark-events:/tmp/spark-events
+    entrypoint:
+      - "bash"
+      - "-c"
+      - "/opt/spark/bin/spark-class org.apache.spark.deploy.history.HistoryServer"
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/tmp/spark-events
