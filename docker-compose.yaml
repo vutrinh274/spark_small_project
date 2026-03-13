@@ -10,6 +10,8 @@ services:
       - SPARK_MASTER_HOST=spark-master
       - SPARK_MASTER_PORT=7077
       - SPARK_MASTER_WEBUI_PORT=8080
+      - SPARK_MASTER_OPTS=-Dspark.deploy.spreadOutApps=true
+      - SPARK_HISTORY_OPTS=-Dspark.eventLog.enabled=true -Dspark.eventLog.dir=file:///tmp/spark-events
     entrypoint: 
       - "bash"
       - "-c"
@@ -26,8 +28,10 @@ services:
       - spark-master
 
     environment:
+      #NOTE: You can adjust the cluster capacity here
       - SPARK_WORKER_CORES=4
-      - SPARK_WORKER_MEMORY=6144m
+      - SPARK_WORKER_MEMORY=4g
+      - SPARK_HISTORY_OPTS=-Dspark.eventLog.enabled=true -Dspark.eventLog.dir=file:///tmp/spark-events
       
     entrypoint:
       - "bash" 
@@ -44,8 +48,10 @@ services:
     depends_on:
       - spark-master
     environment:
+      #NOTE: You can adjust the cluster capacity here
       - SPARK_WORKER_CORES=4
-      - SPARK_WORKER_MEMORY=6144m
+      - SPARK_WORKER_MEMORY=4g
+      - SPARK_HISTORY_OPTS=-Dspark.eventLog.enabled=true -Dspark.eventLog.dir=file:///tmp/spark-events
     entrypoint:
       - "bash" 
       - "-c"

@@ -3,6 +3,9 @@
 
 # Generate 20GB of data
 
+## Install package
+```pip install -r requirements.txt```
+
 ## Generate TCPH data
 Note: If you running out of memory, you can change the -s to lower value, such as 5
 
