@@ -1,3 +1,6 @@
-./venv
+.venv/
+venv/
 .DS_Store
 spark-events/**
+
+data/**
